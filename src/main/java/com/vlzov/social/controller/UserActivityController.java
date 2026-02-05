@@ -1,0 +1,59 @@
+package com.vlzov.social.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vlzov.social.entity.Post;
+import com.vlzov.social.entity.User;
+
+@RestController
+@RequestMapping("/users")
+public class UserActivityController {
+    
+    private final static List<User> users = new ArrayList<>();
+
+    @PostMapping("")
+    public User addUser(@RequestBody User user) {
+        users.add(user);
+        return user;
+    }
+
+    @GetMapping("")
+    public List<User> getUsers() {
+        return users;
+    }
+
+    @GetMapping("/{username}")
+    public User getUserByUsername(@PathVariable("username") String username) {
+        return users.stream().filter(user -> user.getUsername().equals(username))
+                                                    .findFirst().get();
+    }
+
+    @PutMapping("/{username}")
+    public Post update(@PathVariable("username") String username, @RequestBody Post post) {
+        users.stream().filter(user -> 
+                        user.getUsername().equals(username))
+                    .findAny()
+                    .ifPresent(user -> user.getPosts().add(post));
+        return post;
+    }
+
+    @DeleteMapping("/{username}")
+    public String deleteUser(@PathVariable("username") String username) {
+        users.stream().filter(user -> 
+                                user.getUsername().equals(username))
+                                .findAny()
+                                .ifPresent(users::remove);
+        return "User with username: " + username + " has been deleted";
+    }
+
+}
